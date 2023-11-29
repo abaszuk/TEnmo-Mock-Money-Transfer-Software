@@ -23,9 +23,8 @@ public class TransferController {
 
     @PreAuthorize("permitAll")
     @RequestMapping(path = "/transfer/userlist", method = RequestMethod.GET)
-    public List<User> getUsernames() {
-        List<User> users = userDao.findAll();
-        return users;
+    public List<String> getUsernames() {
+        return userDao.findAllUsernames();
     }
 
 

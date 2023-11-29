@@ -20,7 +20,7 @@ public class UserController {
     @Autowired
     private AccountDao accountDao;
 
-    @RequestMapping(path = "/balance", method = RequestMethod.GET)
+    @RequestMapping(path = "/user/balance", method = RequestMethod.GET)
     public BigDecimal getBalance(Principal principal){
         int userId = userDao.findIdByUsername(principal.getName());
         return accountDao.getBalance(userId);

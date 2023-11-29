@@ -22,7 +22,7 @@ public class UserService {
         BigDecimal balance = null;
 
         try {
-            ResponseEntity<BigDecimal> response = restTemplate.exchange(API_BASE_URL + "balance",
+            ResponseEntity<BigDecimal> response = restTemplate.exchange(API_BASE_URL + "user/balance",
                     HttpMethod.GET, makeAuthEntity(), BigDecimal.class);
             balance = response.getBody();
         } catch (RestClientResponseException | ResourceAccessException e) {

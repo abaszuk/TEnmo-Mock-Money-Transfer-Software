@@ -41,16 +41,15 @@ public class JdbcUserDao implements UserDao {
         return users;
     }
     @Override
-    public List<User> findAllUsernames() {
-        List<User> users = new ArrayList<>();
+    public List<String> findAllUsernames() {
+        List<String> usernames = new ArrayList<>();
         String sql = "SELECT username\n" +
                 "FROM tenmo_user;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
         while(results.next()) {
-            User user = mapRowToUser(results);
-            users.add(user);
+            usernames.add(results.getString("username"));
         }
-        return users;
+        return usernames;
     }
 
     @Override
