@@ -2,7 +2,7 @@ BEGIN TRANSACTION;
 
 DROP TABLE IF EXISTS transfer_log, tenmo_user, account;
 
-DROP SEQUENCE IF EXISTS seq_tranfer_id, seq_user_id, seq_account_id;
+DROP SEQUENCE IF EXISTS seq_transfer_id, seq_user_id, seq_account_id;
 
 -- Sequence to start user_id values at 1001 instead of 1
 CREATE SEQUENCE seq_user_id

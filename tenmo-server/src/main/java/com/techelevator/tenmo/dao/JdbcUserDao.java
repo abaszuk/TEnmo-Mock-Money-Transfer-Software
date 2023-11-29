@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -15,11 +16,8 @@ import java.util.List;
 @Component
 public class JdbcUserDao implements UserDao {
 
+    @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    public JdbcUserDao(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
     public int findIdByUsername(String username) {
