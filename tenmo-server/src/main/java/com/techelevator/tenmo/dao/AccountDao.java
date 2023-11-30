@@ -8,7 +8,7 @@ public interface AccountDao {
     BigDecimal getBalance(int userId);
     Account getAccount(int userId);
 
-    BigDecimal add(BigDecimal amount);
+    void add(BigDecimal amount, int userId);
 
-    BigDecimal subtract(BigDecimal amount);
+    void subtract(BigDecimal amount, int userId);
 }

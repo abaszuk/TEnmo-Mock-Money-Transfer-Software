@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.model;
 
+import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -8,6 +9,7 @@ public class Transfer {
     private int transferId;
     private int senderId;
     private int receiverId;
+    @Positive
     private BigDecimal transferAmount;
     private LocalDate sendTime;
     private LocalDate receiveTime;

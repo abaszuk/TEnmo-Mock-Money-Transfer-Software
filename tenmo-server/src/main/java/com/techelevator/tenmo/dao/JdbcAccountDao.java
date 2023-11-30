@@ -43,13 +43,20 @@ public class JdbcAccountDao implements AccountDao{
     }
 
     @Override
-    public BigDecimal add(BigDecimal amount) {
-        return null;
+    public void add(BigDecimal amount, int userId) {
+        String sql = "UPDATE account\n" +
+                "SET balance = (balance + ?)\n" +
+                "WHERE user_id = ?;";
+        jdbcTemplate.update(sql,userId);
     }
 
     @Override
-    public BigDecimal subtract(BigDecimal amount) {
-        return null;
+    public void subtract(BigDecimal amount, int userId) {
+        String sql = "UPDATE account\n" +
+                "SET balance = (balance - ?)\n" +
+                "WHERE user_id = ?;";
+        jdbcTemplate.update(sql,userId);
+
     }
 
     private Account mapRowToAccount(SqlRowSet rowSet) {
