@@ -85,7 +85,17 @@ public class TransferController {
 
         log += LOG_FORMAT.format(transfer.getReceiveTime()) + " " + sender + " sent $" +
                 transfer.getTransferAmount() +
-                " to " + receiver + ", transaction ID is " + transfer.getTransferId();
+                " to " + receiver;
+
+        log += ", transaction ID is " + transfer.getTransferId();
+
+        if (!transfer.isCompleted() && !transfer.isRejected()) {
+            log += ", transfer is pending";
+        }
+
+        if (transfer.isRejected()) {
+            log += ", transfer has been rejected";
+        }
 
         return log;
 
