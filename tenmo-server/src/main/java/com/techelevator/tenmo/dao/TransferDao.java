@@ -10,19 +10,17 @@ public interface TransferDao {
 
     Transfer send(BigDecimal amount, int senderId, int receiverId);
 
-    BigDecimal request();
+    Transfer request(BigDecimal amount, int senderId, int receiverId);
 
-    BigDecimal approve();
+    Transfer approve(int transferId);
 
-    List<Transfer> pending();
+    List<Transfer> pending(int userId);
 
-    List<Transfer> log();
-
-    Transfer getTransfer();
+    List<Transfer> history(int userId);
 
     Transfer getTransferById(int transferId);
 
-    List<Transfer> rejected();
+    Transfer reject(int transferId);
 
 
 }
