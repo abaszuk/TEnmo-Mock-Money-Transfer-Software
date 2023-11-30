@@ -13,14 +13,14 @@ import java.security.Principal;
 
 @RestController
 @PreAuthorize("isAuthenticated()")
-public class UserController {
+public class AccountController {
     @Autowired
     private UserDao userDao;
 
     @Autowired
     private AccountDao accountDao;
 
-    @RequestMapping(path = "/user/balance", method = RequestMethod.GET)
+    @RequestMapping(path = "/Account/balance", method = RequestMethod.GET)
     public BigDecimal getBalance(Principal principal){
         int userId = userDao.findIdByUsername(principal.getName());
         return accountDao.getBalance(userId);

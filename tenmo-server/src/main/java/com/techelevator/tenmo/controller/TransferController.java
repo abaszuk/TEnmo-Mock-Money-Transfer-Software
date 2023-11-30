@@ -21,8 +21,10 @@ public class TransferController {
     @Autowired
     private AccountDao accountDao;
 
+    private static final String API_BASE_PATH = "/Transfer";
+
     @PreAuthorize("permitAll")
-    @RequestMapping(path = "/transfer/userlist", method = RequestMethod.GET)
+    @RequestMapping(path = API_BASE_PATH + "/directory", method = RequestMethod.GET)
     public List<String> getUsernames() {
         return userDao.findAllUsernames();
     }
