@@ -3,6 +3,8 @@ package com.techelevator.tenmo.model;
 import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Transfer {
 
@@ -11,8 +13,8 @@ public class Transfer {
     private int receiverId;
     @Positive
     private BigDecimal transferAmount;
-    private LocalDate sendTime;
-    private LocalDate receiveTime;
+    private LocalDateTime sendTime;
+    private LocalDateTime receiveTime;
     private boolean isCompleted;
     private boolean isRejected;
 
@@ -48,19 +50,19 @@ public class Transfer {
         this.transferAmount = transferAmount;
     }
 
-    public LocalDate getSendTime() {
+    public LocalDateTime getSendTime() {
         return sendTime;
     }
 
-    public void setSendTime(LocalDate sendTime) {
+    public void setSendTime(LocalDateTime sendTime) {
         this.sendTime = sendTime;
     }
 
-    public LocalDate getReceiveTime() {
+    public LocalDateTime getReceiveTime() {
         return receiveTime;
     }
 
-    public void setReceiveTime(LocalDate receiveTime) {
+    public void setReceiveTime(LocalDateTime receiveTime) {
         this.receiveTime = receiveTime;
     }
 
@@ -79,4 +81,6 @@ public class Transfer {
     public void setRejected(boolean rejected) {
         isRejected = rejected;
     }
+
+
 }

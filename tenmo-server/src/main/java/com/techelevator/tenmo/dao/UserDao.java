@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface UserDao {
 
+    String findUsernameById(int id);
+
     List<User> findAll();
 
     List<String> findAllUsernames();

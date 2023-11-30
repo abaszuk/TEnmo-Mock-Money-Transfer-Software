@@ -8,6 +8,7 @@ import com.techelevator.tenmo.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -25,6 +27,11 @@ public class TransferController {
     private UserDao userDao;
     @Autowired
     private AccountDao accountDao;
+    @Autowired
+    private TransferDao transferDao;
+
+    private static final DateTimeFormatter LOG_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a");
+
 
     private static final String API_BASE_PATH = "/Transfer";
 
@@ -35,16 +42,50 @@ public class TransferController {
     }
 
     @RequestMapping(path = API_BASE_PATH + "/send", method = RequestMethod.POST)
-    public Transfer send(@PathVariable String user, @PathVariable double amount, Principal principal) {
+    public String send(@PathVariable String user, @PathVariable double amount, Principal principal) {
         int receiverId = userDao.findIdByUsername(user);
         int senderId = userDao.findIdByUsername(principal.getName());
         BigDecimal transferAmount = new BigDecimal(amount);
+        Transfer transfer = null;
+        boolean success = false;
+        try {
+            if (transferAmount.compareTo(BigDecimal.ZERO) > 0) {
+                if (accountDao.getBalance(senderId).compareTo(BigDecimal.ZERO) > 0) {
 
-        if (accountDao.getBalance(senderId).compareTo(new BigDecimal(0)) > 0) {
+                    accountDao.subtract(transferAmount, senderId);
+                    accountDao.add(transferAmount, receiverId);
+                    transfer = transferDao.send(transferAmount, senderId, receiverId);
+                    success = true;
 
-
-
+                } else {
+                    throw new Exception("Insufficient funds in account to complete send");
+                }
+            } else {
+                throw new Exception("Send amount must be a positive number");
+            }
+        } catch(Exception e) {
+            System.out.println(e);
         }
+
+        if (success) {
+            return "Transfer successful \n" + getLog(transfer);
+        } else {
+            return "Transfer unsuccessful";
+        }
+
+    }
+
+    public String getLog(Transfer transfer) {
+
+        String log = "";
+        String sender = userDao.findUsernameById(transfer.getSenderId());
+        String receiver = userDao.findUsernameById(transfer.getReceiverId());
+
+        log += LOG_FORMAT.format(transfer.getReceiveTime()) + " " + sender + " sent $" +
+                transfer.getTransferAmount() +
+                " to " + receiver;
+
+        return log;
 
     }
 

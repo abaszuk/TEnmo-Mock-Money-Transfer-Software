@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -25,7 +26,7 @@ public class JdbcTransferDao implements TransferDao {
         String sql = "INSERT INTO transfer_log(sender_id, receiver_id, transfer_amount, send_time,receive_time,is_completed,is_rejected)\n" +
                 "VALUES (?,?,?,?,?,true,false) RETURNING transfer_id;";
         try{
-           int transferId = jdbcTemplate.queryForObject(sql, int.class,senderId,receiverId,amount, LocalDate.now(),LocalDate.now());
+           int transferId = jdbcTemplate.queryForObject(sql, int.class,senderId,receiverId,amount, LocalDateTime.now(),LocalDateTime.now());
            transfer = getTransferById(transferId);
         } catch (Exception e){
             System.out.println("something went wrong with a send");
@@ -39,7 +40,7 @@ public class JdbcTransferDao implements TransferDao {
         String sql = "INSERT INTO transfer_log(sender_id, receiver_id, transfer_amount, send_time,receive_time,is_completed,is_rejected)\n" +
                 "VALUES (?,?,?,?,?,false,false) RETURNING transfer_id;";
         try{
-            int transferId = jdbcTemplate.queryForObject(sql, int.class,senderId,receiverId,amount, LocalDate.now(),LocalDate.now());
+            int transferId = jdbcTemplate.queryForObject(sql, int.class,senderId,receiverId,amount, LocalDateTime.now(),LocalDateTime.now());
             transfer = getTransferById(transferId);
         } catch (Exception e){
             System.out.println("something went wrong with a request");
@@ -139,8 +140,8 @@ public class JdbcTransferDao implements TransferDao {
         transfer.setSenderId(rs.getInt("sender_id"));
         transfer.setReceiverId(rs.getInt("receiver_id"));
         transfer.setTransferAmount(rs.getBigDecimal("transfer_amount"));
-        transfer.setSendTime(rs.getDate("send_time").toLocalDate());
-        transfer.setReceiveTime(rs.getDate("receive_time").toLocalDate());
+        transfer.setSendTime(rs.getTimestamp("send_time").toLocalDateTime());
+        transfer.setReceiveTime(rs.getTimestamp("receive_time").toLocalDateTime());
         transfer.setCompleted(rs.getBoolean("is_completed"));
         transfer.setRejected(rs.getBoolean("is_rejected"));
         return transfer;
