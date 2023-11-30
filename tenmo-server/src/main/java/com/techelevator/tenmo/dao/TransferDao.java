@@ -22,5 +22,7 @@ public interface TransferDao {
 
     Transfer reject(int transferId);
 
+    boolean verifyUserInTransaction(int transferId, int userId);
+
 
 }

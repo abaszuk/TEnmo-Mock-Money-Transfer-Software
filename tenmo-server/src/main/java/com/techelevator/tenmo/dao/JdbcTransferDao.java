@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -67,7 +68,7 @@ public class JdbcTransferDao implements TransferDao {
 
     @Override
     public List<Transfer> history(int userId) {
-        List<Transfer> history = null;
+        List<Transfer> history = new ArrayList<>();
         String sql = "SELECT * " +
                 "FROM transfer_log " +
                 "WHERE sender_id = ? OR receiver_id = ?;";
@@ -134,6 +135,26 @@ public class JdbcTransferDao implements TransferDao {
         return transfer;
     }
 
+    @Override
+    public boolean verifyUserInTransaction(int transferId, int userId) {
+        String sql = "SELECT *\n" +
+                "FROM transfer_log\n" +
+                "WHERE transfer_id = ?;";
+        Transfer transfer = null;
+        try {
+            SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, transferId);
+            if (rowSet.next()) {
+                transfer = mapRowToTransfer(rowSet);
+                if (transfer.getReceiverId() == userId || transfer.getSenderId() == userId) {
+                    return true;
+                }
+            }
+        }catch (Exception e){
+            System.out.println("something went wrong with get transfer by id");
+        }
+        return false;
+    }
+
     private Transfer mapRowToTransfer(SqlRowSet rs) {
         Transfer transfer = new Transfer();
         transfer.setTransferId(rs.getInt("transfer_id"));
@@ -146,4 +167,6 @@ public class JdbcTransferDao implements TransferDao {
         transfer.setRejected(rs.getBoolean("is_rejected"));
         return transfer;
     }
+
+
 }

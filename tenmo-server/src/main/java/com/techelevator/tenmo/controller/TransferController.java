@@ -76,32 +76,6 @@ public class TransferController {
         }
 
     }
-    @PreAuthorize("permitAll")
-    @RequestMapping(path = API_BASE_PATH + "/history", method = RequestMethod.GET)
-    public List<String> history(@RequestParam Integer id, Principal principal) {
-        List<String> history = new ArrayList<>();
-        try {
-            if (id != null) {
-                if (transferDao.getTransferById(id) == null) {
-                    throw new Exception("No record of transaction for user");
-                }
-            } else {
-
-                history.add(getLog(transferDao.getTransferById(id)));
-                return history;
-            }
-
-            int userId = userDao.findIdByUsername(principal.getName());
-            for (Transfer transfer : transferDao.history(userId)) {
-                history.add(getLog(transfer));
-            }
-            return history;
-
-        }catch (Exception e){
-            System.out.println("something went wrong with history");
-        }
-        return null;
-    }
 
     private String getLog(Transfer transfer) {
 
