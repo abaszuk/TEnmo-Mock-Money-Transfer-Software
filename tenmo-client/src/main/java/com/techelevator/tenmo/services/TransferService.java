@@ -14,7 +14,7 @@ import java.util.List;
 
 public class TransferService {
 
-    private static final String API_BASE_URL = "http://localhost:8080/transfer";
+    private static final String API_BASE_URL = "http://localhost:8080/Transfer";
     private final RestTemplate restTemplate = new RestTemplate();
     private String authToken = null;
     public void setAuthToken(String authToken){
@@ -26,7 +26,7 @@ public class TransferService {
         List<String> userlist = null;
 
         try {
-            ResponseEntity<List> response = restTemplate.exchange(API_BASE_URL + "/userlist",
+            ResponseEntity<List> response = restTemplate.exchange(API_BASE_URL + "/directory",
                     HttpMethod.GET, makeAuthEntity(), List.class);
             userlist = response.getBody();
         } catch (RestClientResponseException | ResourceAccessException e) {

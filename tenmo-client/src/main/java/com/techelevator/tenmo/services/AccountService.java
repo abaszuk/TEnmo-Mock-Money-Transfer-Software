@@ -11,8 +11,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 
-public class UserService {
-    private static final String API_BASE_URL = "http://localhost:8080/";
+public class AccountService {
+    private static final String API_BASE_URL = "http://localhost:8080/Account";
     private final RestTemplate restTemplate = new RestTemplate();
     private String authToken = null;
     public void setAuthToken(String authToken){
@@ -22,7 +22,7 @@ public class UserService {
         BigDecimal balance = null;
 
         try {
-            ResponseEntity<BigDecimal> response = restTemplate.exchange(API_BASE_URL + "user/balance",
+            ResponseEntity<BigDecimal> response = restTemplate.exchange(API_BASE_URL + "/balance",
                     HttpMethod.GET, makeAuthEntity(), BigDecimal.class);
             balance = response.getBody();
         } catch (RestClientResponseException | ResourceAccessException e) {
