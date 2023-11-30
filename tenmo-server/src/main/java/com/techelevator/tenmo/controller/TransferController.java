@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.security.Principal;
@@ -42,26 +39,30 @@ public class TransferController {
     }
 
     @RequestMapping(path = API_BASE_PATH + "/send", method = RequestMethod.POST)
-    public String send(@PathVariable String user, @PathVariable double amount, Principal principal) {
+    public String send(@RequestParam String user, @RequestParam double amount, Principal principal) {
         int receiverId = userDao.findIdByUsername(user);
         int senderId = userDao.findIdByUsername(principal.getName());
         BigDecimal transferAmount = new BigDecimal(amount);
         Transfer transfer = null;
         boolean success = false;
         try {
-            if (transferAmount.compareTo(BigDecimal.ZERO) > 0) {
-                if (accountDao.getBalance(senderId).compareTo(BigDecimal.ZERO) > 0) {
+            if (senderId != receiverId){
+                if (transferAmount.compareTo(BigDecimal.ZERO) > 0) {
+                    if (accountDao.getBalance(senderId).compareTo(BigDecimal.ZERO) > 0) {
 
-                    accountDao.subtract(transferAmount, senderId);
-                    accountDao.add(transferAmount, receiverId);
-                    transfer = transferDao.send(transferAmount, senderId, receiverId);
-                    success = true;
+                        accountDao.subtract(transferAmount, senderId);
+                        accountDao.add(transferAmount, receiverId);
+                        transfer = transferDao.send(transferAmount, senderId, receiverId);
+                        success = true;
 
+                    } else {
+                        throw new Exception("Insufficient funds in account to complete send");
+                    }
                 } else {
-                    throw new Exception("Insufficient funds in account to complete send");
+                    throw new Exception("Send amount must be a positive number");
                 }
             } else {
-                throw new Exception("Send amount must be a positive number");
+                throw new Exception("Cannot send funds to yourself");
             }
         } catch(Exception e) {
             System.out.println(e);
