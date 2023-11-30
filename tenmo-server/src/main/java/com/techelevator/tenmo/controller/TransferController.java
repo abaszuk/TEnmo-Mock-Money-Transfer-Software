@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -75,8 +76,34 @@ public class TransferController {
         }
 
     }
+    @PreAuthorize("permitAll")
+    @RequestMapping(path = API_BASE_PATH + "/history", method = RequestMethod.GET)
+    public List<String> history(@RequestParam Integer id, Principal principal) {
+        List<String> history = new ArrayList<>();
+        try {
+            if (id != null) {
+                if (transferDao.getTransferById(id) == null) {
+                    throw new Exception("No record of transaction for user");
+                }
+            } else {
 
-    public String getLog(Transfer transfer) {
+                history.add(getLog(transferDao.getTransferById(id)));
+                return history;
+            }
+
+            int userId = userDao.findIdByUsername(principal.getName());
+            for (Transfer transfer : transferDao.history(userId)) {
+                history.add(getLog(transfer));
+            }
+            return history;
+
+        }catch (Exception e){
+            System.out.println("something went wrong with history");
+        }
+        return null;
+    }
+
+    private String getLog(Transfer transfer) {
 
         String log = "";
         String sender = userDao.findUsernameById(transfer.getSenderId());
@@ -84,10 +111,11 @@ public class TransferController {
 
         log += LOG_FORMAT.format(transfer.getReceiveTime()) + " " + sender + " sent $" +
                 transfer.getTransferAmount() +
-                " to " + receiver;
+                " to " + receiver + ", transaction ID is " + transfer.getTransferId();
 
         return log;
 
     }
+
 
 }
