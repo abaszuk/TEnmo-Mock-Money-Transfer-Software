@@ -61,6 +61,9 @@ public class MessageController {
         if (friendId == -1) {
             return "No user exists with username " + username;
         }
+        if (userId == friendId) {
+            return "You cannot send messages to yourself";
+        }
         Friends friends = friendsDao.getFriends(userId, friendId);
         if (!friends.isConfirmed()) {
             return "You are not friends with this user, and cannot send or receive messages.";
@@ -92,6 +95,9 @@ public class MessageController {
         int friendId = userDao.findIdByUsername(username);
         if (friendId == -1) {
             return "No user exists with username " + username;
+        }
+        if (userId == friendId) {
+            return "You cannot send messages to yourself";
         }
         Friends friends = friendsDao.getFriends(userId, friendId);
         if (friends == null) {
