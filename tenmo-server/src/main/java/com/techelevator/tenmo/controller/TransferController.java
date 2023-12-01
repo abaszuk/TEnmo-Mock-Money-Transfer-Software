@@ -114,7 +114,7 @@ public class TransferController {
         List<Transfer> pending = new ArrayList<>();
         pending = transferDao.pending(userId);
         for (Transfer transfer : pending){
-            pendingStr.add(getLog(transfer));
+            pendingStr.add(getRequestLog(transfer));
         }
         if (pendingStr.size()== 0){
             pendingStr.add("No pending transactions");
@@ -122,7 +122,7 @@ public class TransferController {
         return pendingStr;
     }
     @RequestMapping(path = API_BASE_PATH + "/pending/{id}", method = RequestMethod.POST)
-    public String approve(@PathVariable int id, Principal principal) {
+    public String approve(@PathVariable int id, Principal principal, @RequestParam(required = false) Boolean approve) {
         int userId = userDao.findIdByUsername(principal.getName());
         boolean success = false;
         boolean nsf = false;
@@ -134,16 +134,40 @@ public class TransferController {
             if (transfer == null) {
                 throw new Exception("no record of request found");
             }
-            if (accountDao.getBalance(userId).subtract(transfer.getTransferAmount()).compareTo(BigDecimal.ZERO) > 0) {
+            if (approve == null){
+                return getRequestLog(transferDao.getTransferById(id));
+            }
+            if (transfer.isCompleted()){
+                return "Not a pending transfer";
+            }
+            if (transfer.isRejected()){
+                return "Someone has already rejected this transfer";
+            }
+            if (transfer.getReceiverId() == userId && approve){
+                return "You cannot approve your own request";
+            }
+            if (transfer.getReceiverId() == userId && !approve){
+                transferDao.reject(id);
+                return "Unsent your request";
+            }
+            if (transfer.getSenderId() == userId && !approve){
+                transferDao.reject(id);
+                return "The request has been rejected";
+            }
+            if (transfer.getSenderId() == userId && approve) {
 
-                accountDao.subtract(transfer.getTransferAmount(), transfer.getSenderId());
-                accountDao.add(transfer.getTransferAmount(), transfer.getReceiverId());
-                transfer = transferDao.approve(id);
-                success = true;
 
-            } else {
-                nsf = true;
-                throw new Exception("Insufficient funds in account to complete send");
+                if (accountDao.getBalance(userId).subtract(transfer.getTransferAmount()).compareTo(BigDecimal.ZERO) > 0) {
+
+                    accountDao.subtract(transfer.getTransferAmount(), transfer.getSenderId());
+                    accountDao.add(transfer.getTransferAmount(), transfer.getReceiverId());
+                    transfer = transferDao.approve(id);
+                    success = true;
+
+                } else {
+                    nsf = true;
+                    throw new Exception("Insufficient funds in account to complete send");
+                }
             }
         } catch (Exception e) {
             System.out.println(e);
@@ -178,6 +202,15 @@ public class TransferController {
 
         return log;
 
+    }
+
+    private String getRequestLog(Transfer transfer){
+        String log = "";
+        String sender = userDao.findUsernameById(transfer.getSenderId());
+        String receiver = userDao.findUsernameById(transfer.getReceiverId());
+
+        log += LOG_FORMAT.format(transfer.getSendTime()) + " " + receiver + " is requesting $" + transfer.getTransferAmount() + " Transfer ID: " + transfer.getTransferId();
+        return log;
     }
 
 
