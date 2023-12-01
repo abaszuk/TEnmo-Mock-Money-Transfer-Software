@@ -1,9 +1,7 @@
 package com.techelevator.tenmo.controller;
 
-import com.techelevator.tenmo.dao.AccountDao;
-import com.techelevator.tenmo.dao.FriendsDao;
-import com.techelevator.tenmo.dao.TransferDao;
-import com.techelevator.tenmo.dao.UserDao;
+import com.techelevator.tenmo.dao.*;
+import com.techelevator.tenmo.model.Comment;
 import com.techelevator.tenmo.model.Transfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,6 +25,8 @@ public class AccountController {
     private TransferDao transferDao;
     @Autowired
     private FriendsDao friendsDao;
+    @Autowired
+    private CommentDao commentDao;
 
     private static final DateTimeFormatter LOG_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a");
     private static final String API_BASE_PATH = "/Account";
@@ -68,6 +68,12 @@ public class AccountController {
 
             if (transferDao.verifyUserInTransaction(id, userId)) {
                 history = getLog(transferDao.getTransferById(id));
+                List<Comment> comments = commentDao.getCommentsByTransferId(id);
+                if (comments != null) {
+                    for (Comment comment : comments) {
+                        history += "\n" + formatComment(comment);
+                    }
+                }
                 return history;
             }
 
@@ -89,6 +95,12 @@ public class AccountController {
 
         return log;
 
+    }
+
+    private String formatComment(Comment comment) {
+        String commentStr = "";
+        commentStr += userDao.findUsernameById(comment.getCommenterId()) + ": \"" + comment.getCommentContent() + "\"";
+        return commentStr;
     }
 
 

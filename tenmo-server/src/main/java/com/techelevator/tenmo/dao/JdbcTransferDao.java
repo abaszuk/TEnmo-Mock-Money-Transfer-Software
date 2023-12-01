@@ -18,8 +18,6 @@ public class JdbcTransferDao implements TransferDao {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    @Autowired
-    private JdbcUserDao jdbcUserDao;
 
     @Override
     public Transfer send(BigDecimal amount, int senderId, int receiverId) {
