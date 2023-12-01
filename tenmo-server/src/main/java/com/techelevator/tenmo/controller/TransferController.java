@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dao.AccountDao;
+import com.techelevator.tenmo.dao.FriendsDao;
 import com.techelevator.tenmo.dao.TransferDao;
 import com.techelevator.tenmo.dao.UserDao;
 import com.techelevator.tenmo.model.Transfer;
@@ -27,11 +28,12 @@ public class TransferController {
     private AccountDao accountDao;
     @Autowired
     private TransferDao transferDao;
+    @Autowired
+    private FriendsDao friendsDao;
 
     private static final DateTimeFormatter LOG_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a");
-
-
     private static final String API_BASE_PATH = "/Transfer";
+
 
     @PreAuthorize("permitAll")
     @RequestMapping(path = API_BASE_PATH + "/directory", method = RequestMethod.GET)

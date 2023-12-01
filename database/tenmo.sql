@@ -1,6 +1,6 @@
 BEGIN TRANSACTION;
 
-DROP TABLE IF EXISTS transfer_log, tenmo_user, account;
+DROP TABLE IF EXISTS friends, transfer_log, tenmo_user, account;
 
 DROP SEQUENCE IF EXISTS seq_transfer_id, seq_user_id, seq_account_id;
 
@@ -48,6 +48,14 @@ CREATE TABLE transfer_log (
 	is_completed boolean NOT NULL,
 	is_rejected boolean NOT NULL DEFAULT false,
 	CONSTRAINT PK_transfer_log PRIMARY KEY (transfer_id)
+);
+
+CREATE TABLE friends (
+	user_a int not null references tenmo_user(user_id),
+	user_b int not null references tenmo_user(user_id),
+	is_confirmed boolean not null,
+	is_active boolean not null,
+	CONSTRAINT PK_friends PRIMARY KEY (user_a, user_b)
 );
 
 
