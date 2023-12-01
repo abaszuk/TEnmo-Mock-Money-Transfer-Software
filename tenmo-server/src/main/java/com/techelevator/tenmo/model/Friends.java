@@ -6,6 +6,15 @@ public class Friends {
     private boolean isConfirmed;
     private boolean isActive;
 
+    public Friends() {}
+
+    public Friends(int userA, int userB, boolean isConfirmed, boolean isActive) {
+        this.userA = userA;
+        this.userB = userB;
+        this.isConfirmed = isConfirmed;
+        this.isActive = isActive;
+    }
+
     public int getUserA() {
         return userA;
     }
