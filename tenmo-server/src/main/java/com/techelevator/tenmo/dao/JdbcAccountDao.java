@@ -35,6 +35,23 @@ public class JdbcAccountDao implements AccountDao{
     }
 
     @Override
+    public int createAccount(int userId) {
+
+        String sql = "INSERT INTO account (user_id, balance) " +
+                "VALUES (?, ?) RETURNING account_id";
+        int newAccountId = 0;
+
+        try {
+            newAccountId = jdbcTemplate.queryForObject(sql, Integer.class, userId, 1000);
+        } catch (DataAccessException e) {
+            System.out.println("something went wrong creating an account");
+        }
+
+        return newAccountId;
+
+    }
+
+    @Override
     public BigDecimal getBalance(int userId) {
         BigDecimal balance = null;
         Account account = getAccount(userId);

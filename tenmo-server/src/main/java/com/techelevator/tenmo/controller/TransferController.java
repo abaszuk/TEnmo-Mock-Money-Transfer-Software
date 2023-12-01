@@ -4,6 +4,7 @@ import com.techelevator.tenmo.dao.AccountDao;
 import com.techelevator.tenmo.dao.FriendsDao;
 import com.techelevator.tenmo.dao.TransferDao;
 import com.techelevator.tenmo.dao.UserDao;
+import com.techelevator.tenmo.model.Friends;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,35 @@ public class TransferController {
     @RequestMapping(path = API_BASE_PATH + "/directory", method = RequestMethod.GET)
     public List<String> getUsernames() {
         return userDao.findAllUsernames();
+    }
+
+    @RequestMapping(path = API_BASE_PATH + "/send", method = RequestMethod.GET)
+    public String sendNull(Principal principal) {
+
+        int userId = userDao.findIdByUsername(principal.getName());
+        List<String> friendslistStr = new ArrayList<>();
+        friendslistStr.add("Friends you can send money to:");
+        List<Friends> friendslistObj = friendsDao.getFriendslist(userId);
+
+        for (Friends friend : friendslistObj) {
+            if (friend.isConfirmed()) {
+                if (friend.getUserA() == userId) {
+                    friendslistStr.add(userDao.findUsernameById(friend.getUserB()));
+                } else if (friend.getUserB() == userId) {
+                    friendslistStr.add(userDao.findUsernameById(friend.getUserA()));
+                }
+            }
+        }
+
+        if (friendslistStr.size() == 0) {
+            return "You have no friends";
+        }
+
+        String result = String.join("\n", friendslistStr);
+
+
+        return result;
+
     }
 
     @RequestMapping(path = API_BASE_PATH + "/send", method = RequestMethod.POST)

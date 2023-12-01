@@ -1,8 +1,8 @@
 BEGIN TRANSACTION;
 
-DROP TABLE IF EXISTS friends, transfer_log, tenmo_user, account;
+DROP TABLE IF EXISTS messages, transfer_comments, friends, transfer_log, tenmo_user, account;
 
-DROP SEQUENCE IF EXISTS seq_transfer_id, seq_user_id, seq_account_id;
+DROP SEQUENCE IF EXISTS seq_message_id, seq_comment_id, seq_transfer_id, seq_user_id, seq_account_id;
 
 -- Sequence to start user_id values at 1001 instead of 1
 CREATE SEQUENCE seq_user_id
@@ -57,6 +57,36 @@ CREATE TABLE friends (
 	is_active boolean not null,
 	CONSTRAINT PK_friends PRIMARY KEY (user_a, user_b)
 );
+
+CREATE SEQUENCE seq_comment_id
+  INCREMENT BY 1
+  START WITH 4001
+  NO MAXVALUE;
+  
+CREATE TABLE transfer_comments (
+	comment_id int not null DEFAULT nextval('seq_comment_id'),
+	transfer_id int not null references transfer_log(transfer_id),
+	commenter_id int not null references tenmo_user(user_id),
+	comment_content varchar(200) not null,
+	comment_time timestamp not null,	
+	CONSTRAINT PK_transfer_comments primary key (comment_id)
+);
+
+CREATE SEQUENCE seq_message_id
+  INCREMENT BY 1
+  START WITH 5001
+  NO MAXVALUE;
+
+CREATE TABLE messages (
+	message_id int not null DEFAULT nextval('seq_message_id'),
+	user_a int not null references tenmo_user(user_id),
+	user_b int not null references tenmo_user(user_id),
+	messager_id int not null references tenmo_user(user_id),
+	message_content varchar(200) not null,
+	message_time timestamp not null,
+	CONSTRAINT PK_messages primary key (message_id)
+);
+
 
 
 COMMIT;

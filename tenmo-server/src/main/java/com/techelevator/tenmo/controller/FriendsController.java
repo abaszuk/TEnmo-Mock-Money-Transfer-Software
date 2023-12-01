@@ -112,10 +112,11 @@ public class FriendsController {
     }
 
     @RequestMapping(path = API_BASE_PATH + "/friendslist", method = RequestMethod.GET)
-    public List<String> friendslist(Principal principal) {
+    public String friendslist(Principal principal) {
 
         int userId = userDao.findIdByUsername(principal.getName());
         List<String> friendslistStr = new ArrayList<>();
+        friendslistStr.add("Friendslist:");
         List<Friends> friendslistObj = friendsDao.getFriendslist(userId);
 
         for (Friends friend : friendslistObj) {
@@ -129,10 +130,13 @@ public class FriendsController {
         }
 
         if (friendslistStr.size() == 0) {
-            friendslistStr.add("You have no friends");
+            return "You have no friends";
         }
 
-        return friendslistStr;
+        String result = String.join("\n", friendslistStr);
+
+
+        return result;
 
     }
 
