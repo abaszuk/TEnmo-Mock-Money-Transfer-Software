@@ -44,7 +44,7 @@ public class FriendsController {
         Friends friends = friendsDao.getFriends(userId, friendId);
 
         if (friends == null) {
-            friendsDao.createFriends(createFriends(userId, friendId));
+            friendsDao.createFriends(new Friends(userId, friendId, false, false));
         }
 
         if (friends != null) {
@@ -85,7 +85,7 @@ public class FriendsController {
         Friends friends = friendsDao.getFriends(userId, friendId);
 
         if (friends == null) {
-            friendsDao.createFriends(createFriends(userId, friendId));
+            friendsDao.createFriends(new Friends(userId, friendId, false, false));
         }
 
         if (friends != null) {
@@ -103,7 +103,7 @@ public class FriendsController {
             }
 
             if (!friends.isActive()) {
-                return "Friend request sent to " + user;
+                return "You are not friends with " + user;
             }
 
         }
@@ -119,13 +119,13 @@ public class FriendsController {
         List<Friends> friendslistObj = friendsDao.getFriendslist(userId);
 
         for (Friends friend : friendslistObj) {
-
-            if (friend.getUserA() == userId && friend.isConfirmed()) {
-                friendslistStr.add(userDao.findUsernameById(friend.getUserB()));
-            } else if (friend.getUserB() == userId && friend.isConfirmed()) {
-                friendslistStr.add(userDao.findUsernameById(friend.getUserA()));
+            if (friend.isConfirmed()) {
+                if (friend.getUserA() == userId) {
+                    friendslistStr.add(userDao.findUsernameById(friend.getUserB()));
+                } else if (friend.getUserB() == userId) {
+                    friendslistStr.add(userDao.findUsernameById(friend.getUserA()));
+                }
             }
-
         }
 
         if (friendslistStr.size() == 0) {
@@ -161,12 +161,5 @@ public class FriendsController {
 
     }
 
-    private Friends createFriends(int userId, int friendId) {
-        Friends friends = new Friends();
-        friends.setUserA(userId);
-        friends.setUserB(friendId);
-        friends.setActive(false);
-        friends.setConfirmed(false);
-        return friends;
-    }
+
 }
