@@ -51,7 +51,7 @@ public class TransferController {
         try {
             if (senderId != receiverId){
                 if (transferAmount.compareTo(BigDecimal.ZERO) > 0) {
-                    if (accountDao.getBalance(senderId).compareTo(BigDecimal.ZERO) > 0) {
+                    if (accountDao.getBalance(senderId).subtract(new BigDecimal(amount)).compareTo(BigDecimal.ZERO) > 0) {
 
                         accountDao.subtract(transferAmount, senderId);
                         accountDao.add(transferAmount, receiverId);
@@ -77,6 +77,83 @@ public class TransferController {
             return "Transfer unsuccessful";
         }
 
+    }
+    @RequestMapping(path = API_BASE_PATH + "/request", method = RequestMethod.POST)
+    public String request(@RequestParam String user, @RequestParam double amount, Principal principal){
+        int receiverId = userDao.findIdByUsername(principal.getName());
+        int senderId = userDao.findIdByUsername(user);
+        BigDecimal transferAmount = new BigDecimal(amount);
+        Transfer transfer = null;
+        boolean success = false;
+        try {
+            if (senderId != receiverId){
+                if (transferAmount.compareTo(BigDecimal.ZERO) > 0) {
+                    transfer = transferDao.request(transferAmount, senderId, receiverId);
+                    success = true;
+                } else {
+                    throw new Exception("Send amount must be a positive number");
+                }
+            } else {
+                throw new Exception("Cannot send funds to yourself");
+            }
+        } catch(Exception e) {
+            System.out.println(e);
+        }
+
+        if (success) {
+            return "Request successful \n" + getLog(transfer);
+        } else {
+            return "Request unsuccessful";
+        }
+
+    }
+    @RequestMapping(path = API_BASE_PATH + "/pending", method = RequestMethod.GET)
+    public List<String> pending(Principal principal){
+        int userId = userDao.findIdByUsername(principal.getName());
+        List<String> pendingStr = new ArrayList<>();
+        List<Transfer> pending = new ArrayList<>();
+        pending = transferDao.pending(userId);
+        for (Transfer transfer : pending){
+            pendingStr.add(getLog(transfer));
+        }
+        if (pendingStr.size()== 0){
+            pendingStr.add("No pending transactions");
+        }
+        return pendingStr;
+    }
+    @RequestMapping(path = API_BASE_PATH + "/pending/{id}", method = RequestMethod.POST)
+    public String approve(@PathVariable int id, Principal principal) {
+        int userId = userDao.findIdByUsername(principal.getName());
+        boolean success = false;
+        boolean nsf = false;
+        if (!transferDao.verifyUserInTransaction(id, userId)) {
+            return "Cannot approve that transaction";
+        }
+        Transfer transfer = transferDao.getTransferById(id);
+        try {
+            if (transfer == null) {
+                throw new Exception("no record of request found");
+            }
+            if (accountDao.getBalance(userId).subtract(transfer.getTransferAmount()).compareTo(BigDecimal.ZERO) > 0) {
+
+                accountDao.subtract(transfer.getTransferAmount(), transfer.getSenderId());
+                accountDao.add(transfer.getTransferAmount(), transfer.getReceiverId());
+                transfer = transferDao.approve(id);
+                success = true;
+
+            } else {
+                nsf = true;
+                throw new Exception("Insufficient funds in account to complete send");
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        if (success){
+            return "request has been approved";
+        } if (nsf){
+            return "insufficient funds";
+        }
+        return null;
     }
 
     private String getLog(Transfer transfer) {

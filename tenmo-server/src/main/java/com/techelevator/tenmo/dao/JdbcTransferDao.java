@@ -51,7 +51,7 @@ public class JdbcTransferDao implements TransferDao {
 
     @Override
     public List<Transfer> pending(int userId) {
-        List<Transfer> pendingTransfers = null;
+        List<Transfer> pendingTransfers = new ArrayList<>();
         String sql = "SELECT * " +
                 "FROM transfer_log " +
                 "WHERE sender_id = ? AND is_completed = false;";
