@@ -87,6 +87,4 @@ CREATE TABLE messages (
 	CONSTRAINT PK_messages primary key (message_id)
 );
 
-
-
 COMMIT;

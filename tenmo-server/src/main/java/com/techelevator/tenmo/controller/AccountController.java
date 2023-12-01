@@ -38,6 +38,20 @@ public class AccountController {
         return accountDao.getBalance(userId);
     }
 
+    @RequestMapping(path = API_BASE_PATH + "/deposit", method = RequestMethod.POST)
+    public String deposit(@RequestParam double amount, Principal principal) {
+
+        int userId = userDao.findIdByUsername(principal.getName());
+        BigDecimal amountBD = new BigDecimal(amount);
+
+        if (amountBD.compareTo(BigDecimal.ZERO) < 1) {
+            return "Cannot deposit a number less than or equal to zero";
+        }
+        accountDao.add(amountBD, userId);
+        return "Successfully deposited $" + amountBD + " in your account";
+
+    }
+
 
     @RequestMapping(path = API_BASE_PATH + "/history", method = RequestMethod.GET)
     public List<String> history(Principal principal) {
